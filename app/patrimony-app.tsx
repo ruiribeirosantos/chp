@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDownRight, Bell, Building2, CalendarDays, ChartNoAxesCombined, CircleAlert, ClipboardCheck, ContactRound, Download, FileSpreadsheet, FileText, Home, Landmark, Lightbulb, LogOut, Menu, PackageCheck, PanelLeftClose, PanelLeftOpen, Pencil, Plus, Printer, ReceiptText, Search, ShieldCheck, Sparkles, Target, Trash2, Upload, Users, Wrench, X } from "lucide-react";
+import { ArrowDownRight, Bell, Building2, CalendarDays, ChartNoAxesCombined, ChevronRight, CircleAlert, ClipboardCheck, ContactRound, Download, FileSpreadsheet, FileText, Home, Landmark, Lightbulb, LogOut, Menu, PackageCheck, PanelLeftClose, PanelLeftOpen, Pencil, Plus, Printer, ReceiptText, Search, ShieldCheck, Sparkles, Target, Trash2, Upload, Users, Wrench, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -542,7 +542,6 @@ function rentLedger(state: AppState): LedgerRow[] {
   }
   return rows.sort((a, b) => b.period.localeCompare(a.period));
 }
-
 type AlertItem = {
   id: string;
   date: string;
@@ -990,8 +989,8 @@ export function PatrimonyApp() {
         <div className="brand">
           <img className="brand-mark" src="/rrs-icon.png" alt="RRS" />
           <div>
-            <strong>Controller Home</strong>
-            <small>Gestão Patrimonial</small>
+            <strong>Património</strong>
+            <small>Gestão patrimonial</small>
           </div>
           <button className="collapse-button" onClick={() => setSidebarCollapsed((current) => !current)} aria-label={sidebarCollapsed ? "Expandir menu lateral" : "Minimizar menu lateral"} title={sidebarCollapsed ? "Expandir menu" : "Minimizar menu"}>
             {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
@@ -1023,6 +1022,7 @@ export function PatrimonyApp() {
           ))}
         </nav>
         <div className="sidebar-footer">
+          <span className="environment-badge">PRODUÇÃO</span>
           <div className={`sync-card sidebar-sync ${saving ? "saving" : syncError ? "error" : "synced"}`}>
             <i />
             <div>
@@ -1031,11 +1031,12 @@ export function PatrimonyApp() {
             </div>
           </div>
           <div className="independent-note">
-            <ShieldCheck />
+            <span className="footer-avatar">{(firebaseUser.displayName || firebaseUser.email || "RR").split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</span>
             <div>
-              <strong>Aplicação autónoma</strong>
-              <span>Dados patrimoniais protegidos</span>
+              <strong>{firebaseUser.displayName || "Rui Ribeiro Santos"}</strong>
+              <span>Administrador</span>
             </div>
+            <LogOut />
           </div>
         </div>
       </aside>
@@ -1045,26 +1046,16 @@ export function PatrimonyApp() {
             <Menu />
           </button>
           <div className="topbar-context">
-            <p>Património particular</p>
-            <h1>{NAV.find((item) => item.id === view)?.label}</h1>
+            <span>Património</span>
+            <ChevronRight />
+            <strong>{NAV.find((item) => item.id === view)?.label}</strong>
           </div>
           <div className="top-actions">
-            <button
-              className="user-session"
-              onClick={async () => {
-                await signOut(firebaseAuth);
-              }}
-            >
-              <span className="avatar">{(firebaseUser.displayName || firebaseUser.email || "R").slice(0, 1).toUpperCase()}</span>
-              <span>
-                <strong>{firebaseUser.displayName || firebaseUser.email || "Utilizador"}</strong>
-                <small>Terminar sessão</small>
-              </span>
-              <LogOut />
-            </button>
-            <button className="icon-button" aria-label="Notificações">
-              <Bell />
-            </button>
+            <label className="global-search">
+              <Search />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Pesquisar em toda a informação…" />
+            </label>
+            <time>{new Date().toLocaleDateString("pt-PT")}</time>
           </div>
         </header>
         <section className="content">
@@ -1232,7 +1223,6 @@ export function PatrimonyApp() {
     </div>
   );
 }
-
 function Dashboard({ state, propertyName, properties, occupied, income, occupancy, overdue, pendingCosts, maintenanceActual, onArchive, onNotice, onObligations }: { state: AppState; propertyName: (id: string) => string; properties: number; occupied: number; income: number; occupancy: number; overdue: number; pendingCosts: number; maintenanceActual: number; onArchive: (file?: File) => Promise<void>; onNotice: (message: string) => void; onObligations: () => void }) {
   const today = new Date().toISOString().slice(0, 10);
   const alerts = alertFeed(state);
